@@ -1,4 +1,10 @@
 *.py[co]
+*.pyc
+*.swp
+*.swo
+*~
+*.mo
+*.komodoproject
 
 # Packages
 *.egg
@@ -12,6 +18,7 @@ var
 sdist
 develop-eggs
 .installed.cfg
+limnoria.code-workspace
 
 # Installer logs
 pip-log.txt

@@ -1,45 +1,57 @@
-[![Build Status](https://travis-ci.org/reticulatingspline/UrbanDictionary.svg?branch=master)](https://travis-ci.org/reticulatingspline/UrbanDictionary)
-
 # Limnoria plugin for UrbanDictionary
+
+![Python versions](https://img.shields.io/badge/Python-version-blue) ![Supported Python versions](https://img.shields.io/badge/3.10%2C%203.11%2C%203.12%2C%203.13-blue.svg)
 
 ## Introduction
 
-Limnoria plugin for querying [UrbanDictionary](http://www.urbandictionary.com) 
+Limnoria plugin for querying [UrbanDictionary](http://www.urbandictionary.com)
+
+_An asynchronous variant of the original UrbanDictionary plugin._
 
 ## Install
 
-You will need a working Limnoria bot on Python 2.7 for this to work.
+You will need a working Limnoria bot on Python 3.10 or above for this to work.
 
-Go into your Limnoria plugin dir, usually ~/supybot/plugins and run:
+Go into your Limnoria plugin dir, usually ~/runbot/plugins and run:
 
-```
-git clone https://github.com/reticulatingspline/UrbanDictionary
+```plaintext
+git clone https://github.com/Alcheri/UrbanDictionary
+
 ```
 
 To install additional requirements, run:
 
-```
-pip install -r requirements.txt 
+```plaintext
+pip install --upgrade -r requirements.txt 
 ```
 
 Next, load the plugin:
 
-```
+```plaintext
 /msg bot load UrbanDictionary
 ```
 
+## Configuring
+
+* **_supybot.plugins.UrbanDictionary.maxNumberOfDefinitions_**
+
+    Number of definition and examples in output. Max 10.
+
+* **_supybot.plugins.UrbanDictionary.disableANSI_**
+
+    Do not display any ANSI formatting codes in output. Default is _False_
+
+* **_supybot.plugins.UrbanDictionary.enabled_**
+
+    Should plugin work in this channel?
+
+* **_aka add ud urbandictionary $*_**
+
+    Add an alias to your bot for ease of use.
+
 ## Example Usage
 
+```plaintext
+@ud spline
+spline :: The [object] which [Maxis] likes to [reticulate]. Example: 1:  "What [are you] reticulating, dude?"2:  "[My favorite] dish-- [Splines]!" | A combination organ between [the spine] and the [spleen]. One which doesn't exist, but you should ask [the stoner] people how it's doing anyways. Example: Hey [Maya], how's your spline doing? What? Not to well? Oh, [I'm sorry] to [hear] that.
 ```
-<spline> @ud spline
-<myybot> spline :: The object which Maxis likes to reticulate. [ex:] 1:  "What are you reticulating, dude?"2:  "My favorite dish-- Splines!" [/ex]
-```
-
-## About
-
-All of my plugins are free and open source. When I first started out, one of the main reasons I was
-able to learn was due to other code out there. If you find a bug or would like an improvement, feel
-free to give me a message on IRC or fork and submit a pull request. Many hours do go into each plugin,
-so, if you're feeling generous, I do accept donations via Amazon or browse my [wish list](http://amzn.com/w/380JKXY7P5IKE).
-
-I'm always looking for work, so if you are in need of a custom feature, plugin or something bigger, contact me via GitHub or IRC.

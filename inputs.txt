@@ -1,0 +1,8 @@
+[--disableexamples | --showvotes | --num # | --showtags] <term>
+
+Fetches definition for <term> on UrbanDictionary.com.
+
+Use --disableexamples to omit examples.
+Use --showvotes to display vote counts (default: off).
+Use --num # to limit the number of definitions (default: 10).
+Use --showtags to display tags (if available).

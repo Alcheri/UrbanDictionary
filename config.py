@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2012-2013, spline
+# Copyright © MMXXIV, Barry Suridge
 # All rights reserved.
 #
 #
@@ -21,7 +22,20 @@ def configure(advanced):
 
 
 UrbanDictionary = conf.registerPlugin('UrbanDictionary')
-conf.registerChannelValue(UrbanDictionary, 'maxNumberOfDefinitions', registry.Integer(10, """Number of definition and examples in output. Max 10."""))
-conf.registerChannelValue(UrbanDictionary, 'disableANSI', registry.Boolean(False, """Do not display any ANSI formatting codes in output."""))
+
+conf.registerChannelValue(
+    UrbanDictionary, 'maxNumberOfDefinitions', registry.Integer(
+        10, """Number of definition and examples in output. Max 10.""")
+)
+
+conf.registerChannelValue(
+    UrbanDictionary, 'disableANSI', registry.Boolean(
+        False, """Do not display any ANSI formatting codes in output.""")
+)
+
+conf.registerChannelValue(
+    UrbanDictionary, 'enabled', registry.Boolean(
+        False, _("""Should plugin work in this channel?"""))
+)
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=250:

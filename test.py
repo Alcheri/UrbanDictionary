@@ -1,11 +1,13 @@
 ###
 # Copyright (c) 2012-2014, spline
+# Copyright © MMXXIV, Barry Suridge
 # All rights reserved.
 #
 #
 ###
 
 from supybot.test import *
+import supybot.conf as conf
 
 class UrbanDictionaryTestCase(PluginTestCase):
     plugins = ('UrbanDictionary',)

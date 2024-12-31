@@ -1,6 +1,5 @@
 # Limnoria plugin for UrbanDictionary
 
-[![Build Status](https://app.travis-ci.com/Alcheri/UrbanDictionary.svg?token=pN4Z7GMexmH2xhm1Tq8j&branch=Limnoria-UrbanDictionary)](https://app.travis-ci.com/Alcheri/UrbanDictionary)
 ![Python versions](https://img.shields.io/badge/Python-version-blue) ![Supported Python versions](https://img.shields.io/badge/3.10%2C%203.11%2C%203.12%2C%203.13-blue.svg)
 
 ## Introduction
@@ -54,7 +53,5 @@ Next, load the plugin:
 
 ```plaintext
 @ud spline
-spline :: The [object] which [Maxis] likes to [reticulate]. Example: 1:  "What [are you] reticulating, dude?" 2:  "[My favorite] dish-- [Splines]!" |
-A combination organ between [the spine] and the [spleen]. One which doesn't exist, but you should ask [the stoner] people how it's doing anyways.
-Example: Hey [Maya], how's your spline doing? What? Not to well? Oh, [I'm sorry] to [hear] that.
+spline :: The [object] which [Maxis] likes to [reticulate]. Example: 1:  "What [are you] reticulating, dude?"2:  "[My favorite] dish-- [Splines]!" | A combination organ between [the spine] and the [spleen]. One which doesn't exist, but you should ask [the stoner] people how it's doing anyways. Example: Hey [Maya], how's your spline doing? What? Not to well? Oh, [I'm sorry] to [hear] that.
 ```

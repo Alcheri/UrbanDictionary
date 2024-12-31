@@ -1,0 +1,317 @@
+--- plugin.bak	2024-12-28 09:39:13.639183217 +1100
++++ plugin.py	2024-12-28 13:49:22.579171219 +1100
+@@ -1,158 +1,192 @@
+ # -*- coding: utf-8 -*-
+ ###
+ # Copyright (c) 2012-2013, spline
++# Copyright © MMXXIV, Barry Suridge
+ # All rights reserved.
+ #
++# Asynchronous variant of the original UrbanDictionary plugin.
+ #
+ ###
+-from __future__ import unicode_literals
+-# my libs
++
++# Standard library imports
+ import json
+-import re
+-# supybot libs
+-import supybot.utils as utils
++from typing import Any, Dict, List, Optional, Tuple
++
++# Third-party imports
++try:
++    import aiohttp       # asynchronous HTTP client and server framework
++    import asyncio       # asynchronous I/O
++except ImportError as ie:
++    raise Exception(f'Cannot import module: {ie}')
++
++# Supybot imports
++import supybot.log as log
+ from supybot.commands import *
+-import supybot.plugins as plugins
+ import supybot.ircutils as ircutils
+ import supybot.callbacks as callbacks
+-from supybot.i18n import PluginInternationalization, internationalizeDocstring
+ 
+-_ = PluginInternationalization('UrbanDictionary')
++try:
++    from supybot.i18n import PluginInternationalization
++    _ = PluginInternationalization('UrbanDictionary')
++except ImportError:
++    _ = lambda x: x
+ 
+-@internationalizeDocstring
+ class UrbanDictionary(callbacks.Plugin):
+-    """Add the help for "@plugin help UrbanDictionary" here
+-    This should describe *how* to use this plugin."""
+-    threaded = True
++    """
++    Add the help for "@plugin help UrbanDictionary" here
++    This should describe *how* to use this plugin.
++    """
++    threaded = False
+ 
+     ######################
+     # INTERNAL FUNCTIONS #
+     ######################
+ 
+-    def _red(self, string):
+-        """return a red string."""
+-        return ircutils.mircColor(string, 'red')
+-
+-    def _bu(self, string):
+-        """bold and underline string."""
+-        return ircutils.bold(ircutils.underline(string))
+-
+-    def cleanjson(self, s):
+-        """clean up json and return."""
+-
+-        s = s.replace('\n', '')
+-        s = s.replace('\r', '')
+-        s = s.replace('\t', '')
+-        s = s.strip()
+-        # return
+-        return s
++    def _format_text(self, string: str, color: Optional[str] = None, bold: bool = False, underline: bool = False) -> str:
++        """Format a string with optional color, bold, and underline."""
++        if color:
++            string = ircutils.mircColor(string, color)
++        if bold:
++            string = ircutils.bold(string)
++        if underline:
++            string = ircutils.underline(string)
++        return string
++
++    def _clean_json(self, s: str) -> str:
++        """Clean up JSON strings by removing unnecessary whitespace and escape characters."""
++        return s.replace('\n', '').replace('\r', '').replace('\t', '').strip()
++
++    async def _fetch_url(self, url: str) -> Optional[str]:
++        """Fetch data from a URL asynchronously using aiohttp."""
++        try:
++            async with aiohttp.ClientSession() as session:
++                async with session.get(url, timeout=10) as response:
++                    if response.status == 200:
++                        return await response.text()
++                    else:
++                        log.error(f"Error fetching URL {url}: HTTP {response.status}")
++                        return None
++        except Exception as e:
++            log.error(f"Error fetching URL {url}: {e}")
++            return None
+ 
+     ####################
+     # PUBLIC FUNCTIONS #
+     ####################
+ 
+-    def urbandictionary(self, irc, msg, args, optlist, optterm):
++    def urbandictionary(self, irc, msg, args, optlist: List[Tuple[str, Any]], optterm: str):
+         """[--disableexamples | --showvotes | --num # | --showtags] <term>
+ 
+-        Fetches definition for <term> on UrbanDictionary.com
++        Fetches definition for <term> on UrbanDictionary.com.
+ 
+-        Use --disableexamples to not display examples.
+-        Use --showvotes to show votes [default: off]
+-        Use --num # to limit the number of definitions. [default:10]
+-        Use --showtags to display tags (if available)
++        Use --disableexamples to omit examples.
++        Use --showvotes to display vote counts (default: off).
++        Use --num # to limit the number of definitions (default: 10).
++        Use --showtags to display tags (if available).
+         """
+-
+-        # default args for output. can manip via --getopts.
+-        args = {'showExamples': True,
+-                'numberOfDefinitions':self.registryValue('maxNumberOfDefinitions'),
+-                'showVotes': False,
+-                'showTags':False
+-               }
+-        # optlist to change args.
+-        if optlist:
+-            for (key, value) in optlist:
+-                if key == 'disableexamples':
+-                    args['showExamples'] = False
+-                if key == 'showvotes':
+-                    args['showVotes'] = True
+-                if key == 'showtags':
+-                    args['showTags'] = True
+-                if key == 'num':  # if number is >, default to config var.
+-                    if 0 <= value <= self.registryValue('maxNumberOfDefinitions'):
+-                        args['numberOfDefinitions'] = value
+-        # build and fetch url.
+-        url = 'http://api.urbandictionary.com/v0/define?term=%s' % utils.web.urlquote(optterm)
+-        try:
+-            html = utils.web.getUrl(url)
+-        except utils.web.Error as e:
+-            self.log.error("ERROR opening {0} message: {1}".format(url, e))
+-            irc.reply("ERROR: could not open {0} message: {1}".format(url, e))
++        args = {
++            'showExamples': True,
++            'numberOfDefinitions': self.registryValue('maxNumberOfDefinitions'),
++            'showVotes': False,
++            'showTags': False
++        }
++
++        # Parse options
++        for key, value in optlist:
++            if key == 'disableexamples':
++                args['showExamples'] = False
++            elif key == 'showvotes':
++                args['showVotes'] = True
++            elif key == 'num' and 0 <= value <= self.registryValue('maxNumberOfDefinitions'):
++                args['numberOfDefinitions'] = value
++            elif key == 'showtags':
++                args['showTags'] = True
++
++        # Use the dynamic term directly.
++        url = f"http://api.urbandictionary.com/v0/define?term={optterm}"
++
++        loop = asyncio.get_event_loop()
++        json_data = loop.run_until_complete(self._fetch_url(url))
++        
++        if not json_data:
++            irc.error(f"Could not retrieve data for '{optterm}'.", prefixNick=False)
+             return
+-        # try parsing json.
+-        #irc.reply("{0}".format(self._repairjson(html.decode('utf-8'))))
++
+         try:
+-            #jsondata = self._repairjson(html.decode('utf-8'))  # decode utf-8. fix \r\n that ud puts in below.
+-            jsondata = html.decode('utf-8')
+-            jsondata = json.loads(jsondata)  # odds chars in UD.
+-        except Exception as e:
+-            self.log.error("Error parsing JSON from UD: {0}".format(e))
+-            irc.reply("ERROR: Failed to parse json data. Check logs for error")
++            data = json.loads(json_data)
++        except json.JSONDecodeError as e:
++            log.error(f"Error parsing JSON: {e}")
++            irc.error("Failed to parse Urban Dictionary data.", prefixNick=False)
+             return
+-        # process json.
+-        results = jsondata.get('result_type')  # exact, no_results, fulltext .
+-        if not results:
+-            # assume exact i guess... 
+-            results = 'exact'
+-        definitions = jsondata.get('list')
+-        # prep output now depending on results.
+-        if results == "exact":  # we did not find anything.
+-            outdefs = []
+-            for i in definitions[0:args['numberOfDefinitions']]:  # iterate through each def.
+-                # clean these up.
+-                definition = self.cleanjson(''.join(i['definition'])) #.encode('utf-8')
+-                example = self.cleanjson(''.join(i['example']))
+-                # now add
+-                outputstring = "{0}".format(definition)  # default string.
+-                if args['showExamples']:  # show examples?
+-                    outputstring += " {0} {1} {2}".format(self._bu("[ex:]"), example, self._bu("[/ex]"))
+-                if args['showVotes']:  # show votes?
+-                    outputstring += " (+{0}/-{1})".format(i['thumbs_up'], i['thumbs_down'])
+-                outdefs.append(outputstring)  # add to our list.
+-            output = " | ".join([item for item in outdefs])  # create string with everything.
+-        elif results == "fulltext":  # not direct. yields related terms.
+-            output = " | ".join(sorted(set([item['word'] for item in definitions])))  # sorted, unique words.
+-        # output time.
+-        if results == "no_results" or len(definitions) == 0:  # NOTHING FOUND.
+-            irc.reply("ERROR: '{0}' not defined on UrbanDictionary.".format(optterm))
++
++        definitions = data.get('list', [])
++
++        if not definitions:
++            irc.error(f"No definition found for '{optterm}'.", prefixNick=False)
+             return
+-        else:  # we have definitions, so we're gonna output.
+-            # check if we should add tags.
+-            if args['showTags']:  # display tags.
+-                tags = jsondata.get('tags')
+-                if tags:  # we have tags. add it to optterm.
+-                    tags = " | ".join([i for i in tags])
+-                else:
+-                    tags = False
+-            else:
+-                tags = False
+-            # now lets output.
+-            if self.registryValue('disableANSI'):  # disable formatting.
+-                if tags:
+-                    irc.reply("{0} :: {1} :: {2}".format(optterm, tags, ircutils.stripFormatting(output)))
+-                else:
+-                    irc.reply("{0} :: {1}".format(optterm, ircutils.stripFormatting(output)))
+-            else:  # colors.
+-                if tags:
+-                    irc.reply("{0} :: {1} :: {2}".format(self._red(optterm), tags, output))
+-                else:
+-                    irc.reply("{0} :: {1}".format(self._red(optterm), output))
+-
+-    urbandictionary = wrap(urbandictionary, [getopts({'showtags':'',
+-                                                      'showvotes':'',
+-                                                      'num':('int'),
+-                                                      'disableexamples':''}), ('text')])
+ 
+-Class = UrbanDictionary
++        # Apply slicing limit
++        limit = args.get('numberOfDefinitions', 10)
++        definitions = definitions[:limit]
++
++        MAX_TOTAL_LENGTH = 1000  # Limit total response length in characters
++        MAX_ENTRY_LENGTH = 300  # Limit individual entry length
++        output = []
++        total_length = 0
++        include_first = True
++
++        for entry in definitions:
++            definition = self._clean_json(entry.get('definition', ''))
++            example = self._clean_json(entry.get('example', ''))
++            thumbs_up = entry.get('thumbs_up', 0)
++            thumbs_down = entry.get('thumbs_down', 0)
++
++            # Truncate individual parts if necessary
++            if len(definition) > MAX_ENTRY_LENGTH:
++                definition = definition[:MAX_ENTRY_LENGTH] + "..."
++            if args['showExamples'] and len(example) > MAX_ENTRY_LENGTH:
++                example = example[:MAX_ENTRY_LENGTH] + "..."
++
++            formatted = definition
++            if args['showExamples'] and example:
++                formatted += f" Example: {example}"
++            if args['showVotes']:
++                formatted += f" (+{thumbs_up}/-{thumbs_down})"
++
++            # Ensure at least one definition is included
++            if include_first:
++                include_first = False
++            elif total_length + len(formatted) > MAX_TOTAL_LENGTH:
++                break
++
++            output.append(formatted)
++            total_length += len(formatted)
++
++        response = " | ".join(output)
++
++        if args['showTags']:
++            tags = data.get('tags', [])
++            if tags:
++                tag_text = " | ".join(tags)
++                response = f"{response} | Tags: {tag_text}"
++
++        # Check if ANSI should be disabled
++        if self.registryValue('disableANSI'):
++            response = ircutils.stripFormatting(response)
++            optterm = ircutils.stripFormatting(optterm)
++
++        irc.reply(self._format_text(optterm, color='red') + " :: " + response, prefixNick=False)
++
++    urbandictionary = wrap(urbandictionary, [
++        getopts({
++            'disableexamples': '',
++            'showvotes': '',
++            'num': ('int'),
++            'showtags': ''
++        }),
++        ('text')
++    ])
+ 
++Class = UrbanDictionary
+ 
+ # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=250:

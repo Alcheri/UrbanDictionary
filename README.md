@@ -1,5 +1,6 @@
 # Limnoria plugin for UrbanDictionary
 
+[![Build Status](https://app.travis-ci.com/Alcheri/Plugins.svg?branch=master)](https://app.travis-ci.com/Alcheri/My-Limnoria-Plugins)
 ![Python versions](https://img.shields.io/badge/Python-version-blue) ![Supported Python versions](https://img.shields.io/badge/3.10%2C%203.11%2C%203.12%2C%203.13-blue.svg)
 
 ## Introduction

@@ -20,11 +20,5 @@ notifications:
         - "Build #%{build_number}: %{repository} %{branch} (%{commit}) %{author} - %{message}"
         - "Build details: \x03 %{build_url}"
 matrix:
-    allow_failures:
-        - "3.9"
-        - "3.10"
-        - "3.11"
-        - "3.12"
-        - "3.13"
     fast_finish: true
 

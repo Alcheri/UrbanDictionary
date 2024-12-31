@@ -10,7 +10,8 @@ install:
     - pip install -vr requirements.txt||true
 # command to run tests, e.g. python setup.py test
 script:
-- pytest
+- echo $TRAVIS_PYTHON_VERSION
+- cd .. && pytest UrbanDictionary
 notifications:
     email: false
     irc:

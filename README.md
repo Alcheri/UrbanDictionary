@@ -17,7 +17,7 @@ You will need a working Limnoria bot on Python 3.10 or above for this to work.
 Go into your Limnoria plugin dir, usually ~/runbot/plugins and run:
 
 ```plaintext
-git clone https://github.com/Alcheri/UrbanDictionary
+git clone https://github.com/Alcheri/UrbanDictionary.git
 
 ```
 

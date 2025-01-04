@@ -52,8 +52,8 @@ Next, load the plugin:
 ## Example Usage
 
 ```plaintext
-@ud spline
-spline :: The [object] which [Maxis] likes to [reticulate]. Example: 1:  "What [are you] reticulating, dude?"
+<spline> @ud spline
+<myybot> spline :: The [object] which [Maxis] likes to [reticulate]. Example: 1:  "What [are you] reticulating, dude?"
  2: "[My favorite] dish-- [Splines]!" | A combination organ between [the spine] and the [spleen].
 One which doesn't exist, but you should ask [the stoner] people how it's doing anyways.
 Example: Hey [Maya], how's your spline doing? What? Not to well? Oh, [I'm sorry] to [hear] that.

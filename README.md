@@ -16,7 +16,6 @@ Go into your Limnoria plugin dir, usually ~/runbot/plugins and run:
 
 ```plaintext
 git clone https://github.com/Alcheri/UrbanDictionary.git
-
 ```
 
 To install additional requirements, run:

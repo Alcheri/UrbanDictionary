@@ -14,10 +14,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # Third-party imports
 try:
-    import aiohttp       # asynchronous HTTP client and server framework
-    import asyncio       # asynchronous I/O
+    import aiohttp  # asynchronous HTTP client and server framework
+    import asyncio  # asynchronous I/O
 except ImportError as ie:
-    raise Exception(f'Cannot import module: {ie}')
+    raise Exception(f"Cannot import module: {ie}")
 
 # Supybot imports
 import supybot.log as log
@@ -27,22 +27,31 @@ import supybot.callbacks as callbacks
 
 try:
     from supybot.i18n import PluginInternationalization
-    _ = PluginInternationalization('UrbanDictionary')
+
+    _ = PluginInternationalization("UrbanDictionary")
 except ImportError:
     _ = lambda x: x
+
 
 class UrbanDictionary(callbacks.Plugin):
     """
     Add the help for "@plugin help UrbanDictionary" here
     This should describe *how* to use this plugin.
     """
+
     threaded = False
 
     ######################
     # INTERNAL FUNCTIONS #
     ######################
 
-    def _format_text(self, string: str, color: Optional[str] = None, bold: bool = False, underline: bool = False) -> str:
+    def _format_text(
+        self,
+        string: str,
+        color: Optional[str] = None,
+        bold: bool = False,
+        underline: bool = False,
+    ) -> str:
         """Format a string with optional color, bold, and underline."""
         if color:
             string = ircutils.mircColor(string, color)
@@ -54,7 +63,7 @@ class UrbanDictionary(callbacks.Plugin):
 
     def _clean_json(self, s: str) -> str:
         """Clean up JSON strings by removing unnecessary whitespace and escape characters."""
-        return s.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+        return s.replace("\n", "").replace("\r", "").replace("\t", "").strip()
 
     async def _fetch_url(self, url: str) -> Optional[str]:
         """Fetch data from a URL asynchronously using aiohttp."""
@@ -74,7 +83,9 @@ class UrbanDictionary(callbacks.Plugin):
     # PUBLIC FUNCTIONS #
     ####################
 
-    def urbandictionary(self, irc, msg, args, optlist: List[Tuple[str, Any]], optterm: str):
+    def urbandictionary(
+        self, irc, msg, args, optlist: List[Tuple[str, Any]], optterm: str
+    ):
         """[--disableexamples | --showvotes | --num # | --showtags] <term>
 
         Fetches definition for <term> on UrbanDictionary.com.
@@ -85,29 +96,31 @@ class UrbanDictionary(callbacks.Plugin):
         Use --showtags to display tags (if available).
         """
         args = {
-            'showExamples': True,
-            'numberOfDefinitions': self.registryValue('maxNumberOfDefinitions'),
-            'showVotes': False,
-            'showTags': False
+            "showExamples": True,
+            "numberOfDefinitions": self.registryValue("maxNumberOfDefinitions"),
+            "showVotes": False,
+            "showTags": False,
         }
 
         # Parse options
         for key, value in optlist:
-            if key == 'disableexamples':
-                args['showExamples'] = False
-            elif key == 'showvotes':
-                args['showVotes'] = True
-            elif key == 'num' and 0 <= value <= self.registryValue('maxNumberOfDefinitions'):
-                args['numberOfDefinitions'] = value
-            elif key == 'showtags':
-                args['showTags'] = True
+            if key == "disableexamples":
+                args["showExamples"] = False
+            elif key == "showvotes":
+                args["showVotes"] = True
+            elif key == "num" and 0 <= value <= self.registryValue(
+                "maxNumberOfDefinitions"
+            ):
+                args["numberOfDefinitions"] = value
+            elif key == "showtags":
+                args["showTags"] = True
 
         # Use the dynamic term directly.
         url = f"http://api.urbandictionary.com/v0/define?term={optterm}"
 
         loop = asyncio.get_event_loop()
         json_data = loop.run_until_complete(self._fetch_url(url))
-        
+
         if not json_data:
             irc.error(f"Could not retrieve data for '{optterm}'.", prefixNick=False)
             return
@@ -119,14 +132,14 @@ class UrbanDictionary(callbacks.Plugin):
             irc.error("Failed to parse Urban Dictionary data.", prefixNick=False)
             return
 
-        definitions = data.get('list', [])
+        definitions = data.get("list", [])
 
         if not definitions:
             irc.error(f"No definition found for '{optterm}'.", prefixNick=False)
             return
 
         # Apply slicing limit
-        limit = args.get('numberOfDefinitions', 10)
+        limit = args.get("numberOfDefinitions", 10)
         definitions = definitions[:limit]
 
         MAX_TOTAL_LENGTH = 1000  # Limit total response length in characters
@@ -136,21 +149,21 @@ class UrbanDictionary(callbacks.Plugin):
         include_first = True
 
         for entry in definitions:
-            definition = self._clean_json(entry.get('definition', ''))
-            example = self._clean_json(entry.get('example', ''))
-            thumbs_up = entry.get('thumbs_up', 0)
-            thumbs_down = entry.get('thumbs_down', 0)
+            definition = self._clean_json(entry.get("definition", ""))
+            example = self._clean_json(entry.get("example", ""))
+            thumbs_up = entry.get("thumbs_up", 0)
+            thumbs_down = entry.get("thumbs_down", 0)
 
             # Truncate individual parts if necessary
             if len(definition) > MAX_ENTRY_LENGTH:
                 definition = definition[:MAX_ENTRY_LENGTH] + "..."
-            if args['showExamples'] and len(example) > MAX_ENTRY_LENGTH:
+            if args["showExamples"] and len(example) > MAX_ENTRY_LENGTH:
                 example = example[:MAX_ENTRY_LENGTH] + "..."
 
             formatted = definition
-            if args['showExamples'] and example:
+            if args["showExamples"] and example:
                 formatted += f" Example: {example}"
-            if args['showVotes']:
+            if args["showVotes"]:
                 formatted += f" (+{thumbs_up}/-{thumbs_down})"
 
             # Ensure at least one definition is included
@@ -164,28 +177,32 @@ class UrbanDictionary(callbacks.Plugin):
 
         response = " | ".join(output)
 
-        if args['showTags']:
-            tags = data.get('tags', [])
+        if args["showTags"]:
+            tags = data.get("tags", [])
             if tags:
                 tag_text = " | ".join(tags)
                 response = f"{response} | Tags: {tag_text}"
 
         # Check if ANSI should be disabled
-        if self.registryValue('disableANSI'):
+        if self.registryValue("disableANSI"):
             response = ircutils.stripFormatting(response)
             optterm = ircutils.stripFormatting(optterm)
 
-        irc.reply(self._format_text(optterm, color='red') + " :: " + response, prefixNick=False)
+        irc.reply(
+            self._format_text(optterm, color="red") + " :: " + response,
+            prefixNick=False,
+        )
 
-    urbandictionary = wrap(urbandictionary, [
-        getopts({
-            'disableexamples': '',
-            'showvotes': '',
-            'num': ('int'),
-            'showtags': ''
-        }),
-        ('text')
-    ])
+    urbandictionary = wrap(
+        urbandictionary,
+        [
+            getopts(
+                {"disableexamples": "", "showvotes": "", "num": ("int"), "showtags": ""}
+            ),
+            ("text"),
+        ],
+    )
+
 
 Class = UrbanDictionary
 

@@ -11,8 +11,11 @@ Limnoria plugin for UrbanDictionary to display definitions on http://www.urbandi
 """
 
 import sys
+
 if sys.version_info < (3, 10):
-    raise RuntimeError("This plugin requires Python 3.10 or newer. Please upgrade your Python installation.")
+    raise RuntimeError(
+        "This plugin requires Python 3.10 or newer. Please upgrade your Python installation."
+    )
 
 import supybot
 import supybot.world as world
@@ -34,11 +37,12 @@ __maintainer__ = getattr(
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = 'https://github.com/Alcheri/My-Limnoria-Plugins'
+__url__ = "https://github.com/Alcheri/My-Limnoria-Plugins"
 
 from . import config
 from . import plugin
 from importlib import reload
+
 # In case we're being reloaded.
 reload(config)
 reload(plugin)

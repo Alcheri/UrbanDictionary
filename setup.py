@@ -8,9 +8,9 @@
 from supybot.setup import plugin_setup
 
 plugin_setup(
-    'UrbanDictionary',
+    "UrbanDictionary",
     install_requires=[
-        'aiohttp',
-        'asyncio',
+        "aiohttp",
+        "asyncio",
     ],
 )

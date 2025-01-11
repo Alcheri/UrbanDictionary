@@ -10,7 +10,8 @@ import supybot.conf as conf
 import supybot.registry as registry
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
-_ = PluginInternationalization('UrbanDictionary')
+_ = PluginInternationalization("UrbanDictionary")
+
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
@@ -18,24 +19,28 @@ def configure(advanced):
     # user or not.  You should effect your configuration by manipulating the
     # registry as appropriate.
     from supybot.questions import expect, anything, something, yn
-    conf.registerPlugin('UrbanDictionary', True)
+
+    conf.registerPlugin("UrbanDictionary", True)
 
 
-UrbanDictionary = conf.registerPlugin('UrbanDictionary')
+UrbanDictionary = conf.registerPlugin("UrbanDictionary")
 
 conf.registerChannelValue(
-    UrbanDictionary, 'maxNumberOfDefinitions', registry.Integer(
-        10, """Number of definition and examples in output. Max 10.""")
+    UrbanDictionary,
+    "maxNumberOfDefinitions",
+    registry.Integer(10, """Number of definition and examples in output. Max 10."""),
 )
 
 conf.registerChannelValue(
-    UrbanDictionary, 'disableANSI', registry.Boolean(
-        False, """Do not display any ANSI formatting codes in output.""")
+    UrbanDictionary,
+    "disableANSI",
+    registry.Boolean(False, """Do not display any ANSI formatting codes in output."""),
 )
 
 conf.registerChannelValue(
-    UrbanDictionary, 'enabled', registry.Boolean(
-        False, _("""Should plugin work in this channel?"""))
+    UrbanDictionary,
+    "enabled",
+    registry.Boolean(False, _("""Should plugin work in this channel?""")),
 )
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=250:

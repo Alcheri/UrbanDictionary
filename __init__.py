@@ -29,7 +29,7 @@ __author__ = supybot.Author("reticulatingspline", "spline", "")
 __maintainer__ = getattr(
     supybot.authors,
     "Alcheri",
-    supybot.Author("Alcheri", "barry.suridge@gmail.com"),
+    supybot.Author("Barry Suridge", "barry.suridge@gmail.com"),
 )
 
 # This is a dictionary mapping supybot.Author instances to lists of

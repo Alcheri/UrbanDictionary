@@ -41,6 +41,10 @@ class UrbanDictionary(callbacks.Plugin):
 
     threaded = False
 
+    def __init__(self, irc):
+        self.__parent = super(UrbanDictionary, self)
+        self.__parent.__init__(irc)
+
     ######################
     # INTERNAL FUNCTIONS #
     ######################

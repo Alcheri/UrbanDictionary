@@ -17,7 +17,7 @@ try:
     import aiohttp  # asynchronous HTTP client and server framework
     import asyncio  # asynchronous I/O
 except ImportError as ie:
-    raise Exception(f"Cannot import module: {ie}")
+    raise ImportError(f"Cannot import module: {ie}")
 
 # Supybot imports
 import supybot.log as log

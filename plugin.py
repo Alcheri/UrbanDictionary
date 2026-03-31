@@ -9,6 +9,7 @@
 ###
 
 # Standard library imports
+import html
 import json
 import urllib.error
 import urllib.request
@@ -165,6 +166,8 @@ class UrbanDictionary(callbacks.Plugin):
 
         if not description:
             return None
+
+        description = html.unescape(description)
 
         return {
             "list": [

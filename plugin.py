@@ -83,9 +83,10 @@ class UrbanDictionary(callbacks.Plugin):
         """Fetch data from a URL asynchronously using aiohttp."""
         try:
             headers = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "application/json"}
+            request_timeout = aiohttp.ClientTimeout(total=timeout)
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    url, timeout=timeout, headers=headers
+                    url, timeout=request_timeout, headers=headers
                 ) as response:
                     if response.status == 200:
                         return await response.text()
@@ -167,8 +168,7 @@ class UrbanDictionary(callbacks.Plugin):
         if not description:
             return None
 
-        temp = html.escape(description)
-        description = html.unescape(temp)
+        description = html.unescape(description)
 
         return {
             "list": [
@@ -257,6 +257,9 @@ class UrbanDictionary(callbacks.Plugin):
             return
 
         if data is None:
+            if json_data is None:
+                irc.error(f"Could not retrieve data for '{optterm}'.", prefixNick=False)
+                return
             try:
                 data = json.loads(json_data)
             except json.JSONDecodeError as e:

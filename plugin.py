@@ -167,7 +167,8 @@ class UrbanDictionary(callbacks.Plugin):
         if not description:
             return None
 
-        description = html.unescape(description)
+        temp = html.escape(description)
+        description = html.unescape(temp)
 
         return {
             "list": [

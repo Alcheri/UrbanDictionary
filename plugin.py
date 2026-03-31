@@ -128,11 +128,11 @@ class UrbanDictionary(callbacks.Plugin):
         headers = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "text/html"}
         req = urllib.request.Request(url, headers=headers)
         retry_timeout = max(timeout + 10, timeout * 2)
-        html = None
+        page_html = None
         for current_timeout in (timeout, retry_timeout):
             try:
                 with urllib.request.urlopen(req, timeout=current_timeout) as response:
-                    html = response.read().decode("utf-8", errors="replace")
+                    page_html = response.read().decode("utf-8", errors="replace")
                     break
             except (urllib.error.URLError, TimeoutError, OSError) as e:
                 log.error(
@@ -142,7 +142,7 @@ class UrbanDictionary(callbacks.Plugin):
                     e,
                 )
 
-        if not html:
+        if not page_html:
             return None
 
         # Try the most descriptive metadata first, then title as a last resort.
@@ -152,14 +152,14 @@ class UrbanDictionary(callbacks.Plugin):
         )
         description = ""
         for pattern in description_patterns:
-            match = re.search(pattern, html, re.IGNORECASE | re.DOTALL)
+            match = re.search(pattern, page_html, re.IGNORECASE | re.DOTALL)
             if match:
                 description = match.group(1).strip()
                 break
 
         if not description:
             title_match = re.search(
-                r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL
+                r"<title[^>]*>(.*?)</title>", page_html, re.IGNORECASE | re.DOTALL
             )
             if title_match:
                 description = title_match.group(1).strip()

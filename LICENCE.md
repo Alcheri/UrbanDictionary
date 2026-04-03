@@ -1,5 +1,19 @@
 The MIT License (MIT)
 
+# Licence Provenance
+
+This project contains code originally published under the MIT Licence by the
+upstream author. The original licence text is preserved verbatim in
+`LICENSE.txt` in accordance with the requirements of the MIT Licence.
+
+All modifications, additions, and ongoing maintenance performed by Barry
+Suridge are licensed under the terms described in this `LICENCE.md` file.
+
+The presence of both files reflects the legal provenance of the code:
+
+- `LICENSE.txt` — original upstream MIT Licence (unchanged)
+- `LICENCE.md` — licence applying to Barry Suridge’s contributions
+
 Copyright (c) 2024 - 2026 Barry KW Suridge
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

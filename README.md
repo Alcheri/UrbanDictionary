@@ -20,7 +20,6 @@
 </p>
 <!-- README_HEADER:end -->
 
-
 ## Introduction
 
 Limnoria plugin for querying [UrbanDictionary](http://www.urbandictionary.com)
@@ -89,3 +88,17 @@ Notes:
 One which doesn't exist, but you should ask [the stoner] people how it's doing anyways.
 Example: Hey [Maya], how's your spline doing? What? Not to well? Oh, [I'm sorry] to [hear] that.
 ```
+
+## Licensing
+
+This project contains code originally published under the MIT Licence by the
+upstream author. The original licence text is preserved verbatim in
+`LICENSE.txt` as required by the MIT Licence.
+
+All modifications, additions, and ongoing maintenance performed by Barry
+Suridge are licensed under the terms described in `LICENCE.md`.
+
+In summary:
+
+- `LICENSE.txt` — original upstream MIT Licence (unchanged)
+- `LICENCE.md` — licence applying to Barry Suridge’s contributions

@@ -1,3 +1,5 @@
+<!-- An asynchronous variant of the original UrbanDictionary plugin. -->
+
 <h1 align="center">Limnoria plugin for UrbanDictionary</h1>
 
 <!-- README_HEADER:start -->

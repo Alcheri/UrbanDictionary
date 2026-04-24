@@ -22,6 +22,20 @@ classifiers = [
 [project.entry-points.'limnoria.plugins']
 UrbanDictionary = "limnoria_urbandictionary"
 
+[tool.black]
+target-version = ["py310"]
+extend-exclude = '''
+/(
+    backup
+  | conf
+  | data
+  | logs
+  | tmp
+  | __pycache__
+  | \.pytest_cache
+)/
+'''
+
 [tool.setuptools.package-dir]
 "limnoria_urbandictionary" = "."
 "limnoria_urbandictionary.local" = "local/"

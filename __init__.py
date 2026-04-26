@@ -7,7 +7,7 @@
 ###
 
 """
-Limnoria plugin for UrbanDictionary to display definitions on http://www.urbandict.com
+Limnoria plugin for UrbanDictionary to display definitions on https://www.urbandictionary.com/
 """
 
 import sys
@@ -28,12 +28,16 @@ __author__ = supybot.Author("reticulatingspline", "spline", "")
 __maintainer__ = getattr(
     supybot.authors,
     "Alcheri",
-    supybot.Author("Barry Suridge", "barry.suridge@gmail.com"),
+    supybot.Author("Barry Suridge", "Alcheri", "barry.suridge@gmail.com"),
 )
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.
-__contributors__ = {}
+__contributors__ = {
+    supybot.Author("Barry Suridge", "Alcheri", "barry.suridge@gmail.com"): [
+        "Maintenance"
+    ],
+}
 
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = "https://github.com/Alcheri/UrbanDictionary"

@@ -23,6 +23,7 @@ classifiers = [
 UrbanDictionary = "limnoria_urbandictionary"
 
 [tool.black]
+line-length = 79
 target-version = ["py310"]
 extend-exclude = '''
 /(

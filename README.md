@@ -3,23 +3,12 @@
 <h1 align="center">Limnoria plugin for UrbanDictionary</h1>
 
 <!-- README_HEADER:start -->
-<p align="center">
-  <a href="https://github.com/Alcheri/UrbanDictionary/actions/workflows/tests.yml">
-    <img src="https://github.com/Alcheri/UrbanDictionary/actions/workflows/tests.yml/badge.svg" alt="Tests">
-  </a>
-  <a href="https://github.com/Alcheri/UrbanDictionary/actions/workflows/lint.yml">
-    <img src="https://github.com/Alcheri/UrbanDictionary/actions/workflows/lint.yml/badge.svg" alt="Lint">
-  </a>
-  <a href="https://github.com/Alcheri/UrbanDictionary/security/code-scanning">
-    <img src="https://github.com/Alcheri/UrbanDictionary/actions/workflows/codeql.yml/badge.svg" alt="CodeQL">
-  </a>
-  <img src="https://img.shields.io/badge/python-3.9%2B-blue.svg" alt="Python">
-  <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black">
-  <img src="https://img.shields.io/badge/limnoria-compatible-brightgreen.svg" alt="Limnoria">
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="Licence">
-  </a>
-</p>
+[![Tests][tests-badge]][tests-link]
+[![Lint][lint-badge]][lint-link]
+[![CodeQL][codeql-badge]][codeql-link]
+![Python][python-badge]
+![Black][black-badge]
+![Limnoria][limnoria-badge]
 <!-- README_HEADER:end -->
 
 ## Introduction
@@ -41,7 +30,7 @@ git clone https://github.com/Alcheri/UrbanDictionary.git
 To install additional requirements, run:
 
 ```plaintext
-pip install --upgrade -r requirements.txt 
+pip install --upgrade -r requirements.txt
 ```
 
 Next, load the plugin:
@@ -67,11 +56,11 @@ Next, load the plugin:
 * **_config supybot.plugins.UrbanDictionary.requestTimeout_**
 
     HTTP timeout in seconds for API requests. Default is _10_.
-  
+
 * **_config supybot.plugins.UrbanDictionary.preferDefinePage_**
 
     Prefer scraping the define page first instead of using the API endpoint.
-  
+
 * **_aka add ud urbandictionary $*_**
 
     Add an alias to your bot for ease of use.
@@ -109,3 +98,17 @@ In summary:
 
 - In Python 3 files, do not add `# -*- coding: utf-8 -*-` unless a non-default source encoding is required.
 - Use `#!/usr/bin/env python3` only for executable scripts, not import-only modules.
+
+<!-- Badge reference definitions -->
+[tests-badge]: https://github.com/Alcheri/UrbanDictionary/actions/workflows/tests.yml/badge.svg
+[tests-link]: https://github.com/Alcheri/UrbanDictionary/actions/workflows/tests.yml
+
+[lint-badge]: https://github.com/Alcheri/UrbanDictionary/actions/workflows/lint.yml/badge.svg
+[lint-link]: https://github.com/Alcheri/UrbanDictionary/actions/workflows/lint.yml
+
+[codeql-badge]: https://github.com/Alcheri/UrbanDictionary/actions/workflows/codeql.yml/badge.svg
+[codeql-link]: https://github.com/Alcheri/UrbanDictionary/security/code-scanning
+
+[python-badge]: https://img.shields.io/badge/python-3.9%2B-blue.svg
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[limnoria-badge]: https://img.shields.io/badge/limnoria-compatible-brightgreen.svg

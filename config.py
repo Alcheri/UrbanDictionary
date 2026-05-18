@@ -28,13 +28,17 @@ UrbanDictionary = conf.registerPlugin("UrbanDictionary")
 conf.registerChannelValue(
     UrbanDictionary,
     "maxNumberOfDefinitions",
-    registry.Integer(10, """Number of definition and examples in output. Max 10."""),
+    registry.Integer(
+        10, """Number of definition and examples in output. Max 10."""
+    ),
 )
 
 conf.registerChannelValue(
     UrbanDictionary,
     "disableANSI",
-    registry.Boolean(False, """Do not display any ANSI formatting codes in output."""),
+    registry.Boolean(
+        False, """Do not display any ANSI formatting codes in output."""
+    ),
 )
 
 conf.registerChannelValue(

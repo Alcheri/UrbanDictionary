@@ -25,14 +25,20 @@ class UrbanDictionaryTestCase(PluginTestCase):
         super().setUp()
         conf.supybot.plugins.UrbanDictionary.preferDefinePage.setValue(False)
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     def testUrbanDictionary(self, mock_fetch_url):
         mock_fetch_url.return_value = MOCK_JSON_WITH_DEFINITION
         conf.supybot.plugins.UrbanDictionary.disableANSI.setValue("True")
         self.assertRegexp("urbandictionary hello", ":: A greeting")
         self.assertRegexp("urbandictionary spline", ":: A greeting")
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     def testUrbanDictionaryEncodesQueryAndTimeout(self, mock_fetch_url):
         mock_fetch_url.return_value = MOCK_JSON_WITH_DEFINITION
         conf.supybot.plugins.UrbanDictionary.requestTimeout.setValue(7)
@@ -42,12 +48,18 @@ class UrbanDictionaryTestCase(PluginTestCase):
         self.assertIn("term=hello+world", called_url)
         self.assertEqual(called_timeout, 7)
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     def testUrbanDictionaryNoDefinition(self, mock_fetch_url):
         mock_fetch_url.return_value = MOCK_JSON_EMPTY_LIST
         self.assertError("urbandictionary unknownterm")
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url_fallback")
     def testUrbanDictionaryUsesFallback(self, mock_fallback, mock_fetch_url):
         mock_fetch_url.return_value = None
@@ -55,9 +67,14 @@ class UrbanDictionaryTestCase(PluginTestCase):
         self.assertRegexp("urbandictionary hello", ":: A greeting")
         mock_fallback.assert_called_once()
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url_fallback")
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_define_page_fallback")
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_define_page_fallback"
+    )
     def testUrbanDictionaryUsesDefinePageFallback(
         self, mock_define_fallback, mock_json_fallback, mock_fetch_url
     ):
@@ -78,9 +95,14 @@ class UrbanDictionaryTestCase(PluginTestCase):
         self.assertRegexp("urbandictionary bogan", "Fallback definition text")
         mock_define_fallback.assert_called_once()
 
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url", new_callable=AsyncMock)
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
     @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_url_fallback")
-    @patch("UrbanDictionary.plugin.UrbanDictionary._fetch_define_page_fallback")
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_define_page_fallback"
+    )
     def testUrbanDictionaryPreferDefinePage(
         self, mock_define_fallback, mock_json_fallback, mock_fetch_url
     ):

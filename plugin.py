@@ -30,9 +30,7 @@ from supybot.commands import *
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
-DEFAULT_USER_AGENT = (
-    "Limnoria-UrbanDictionary/1.0 (+https://github.com/Alcheri/UrbanDictionary)"
-)
+DEFAULT_USER_AGENT = "Limnoria-UrbanDictionary/1.0 (+https://github.com/Alcheri/UrbanDictionary)"
 
 try:
     from supybot.i18n import PluginInternationalization
@@ -81,7 +79,10 @@ class UrbanDictionary(callbacks.Plugin):
     async def _fetch_url(self, url: str, timeout: int) -> Optional[str]:
         """Fetch data from a URL asynchronously using aiohttp."""
         try:
-            headers = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "application/json"}
+            headers = {
+                "User-Agent": DEFAULT_USER_AGENT,
+                "Accept": "application/json",
+            }
             request_timeout = aiohttp.ClientTimeout(total=timeout)
             async with aiohttp.ClientSession() as session:
                 async with session.get(
@@ -104,12 +105,17 @@ class UrbanDictionary(callbacks.Plugin):
 
     def _fetch_url_fallback(self, url: str, timeout: int) -> Optional[str]:
         """Fallback fetch path using stdlib urllib when aiohttp fails."""
-        headers = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "application/json"}
+        headers = {
+            "User-Agent": DEFAULT_USER_AGENT,
+            "Accept": "application/json",
+        }
         req = urllib.request.Request(url, headers=headers)
         retry_timeout = max(timeout + 10, timeout * 2)
         for current_timeout in (timeout, retry_timeout):
             try:
-                with urllib.request.urlopen(req, timeout=current_timeout) as response:
+                with urllib.request.urlopen(
+                    req, timeout=current_timeout
+                ) as response:
                     return response.read().decode("utf-8", errors="replace")
             except (urllib.error.URLError, TimeoutError, OSError) as e:
                 log.error(
@@ -131,8 +137,12 @@ class UrbanDictionary(callbacks.Plugin):
         page_html = None
         for current_timeout in (timeout, retry_timeout):
             try:
-                with urllib.request.urlopen(req, timeout=current_timeout) as response:
-                    page_html = response.read().decode("utf-8", errors="replace")
+                with urllib.request.urlopen(
+                    req, timeout=current_timeout
+                ) as response:
+                    page_html = response.read().decode(
+                        "utf-8", errors="replace"
+                    )
                     break
             except (urllib.error.URLError, TimeoutError, OSError) as e:
                 log.error(
@@ -159,7 +169,9 @@ class UrbanDictionary(callbacks.Plugin):
 
         if not description:
             title_match = re.search(
-                r"<title[^>]*>(.*?)</title>", page_html, re.IGNORECASE | re.DOTALL
+                r"<title[^>]*>(.*?)</title>",
+                page_html,
+                re.IGNORECASE | re.DOTALL,
             )
             if title_match:
                 description = title_match.group(1).strip()
@@ -212,7 +224,9 @@ class UrbanDictionary(callbacks.Plugin):
         """
         args = {
             "showExamples": True,
-            "numberOfDefinitions": self.registryValue("maxNumberOfDefinitions"),
+            "numberOfDefinitions": self.registryValue(
+                "maxNumberOfDefinitions"
+            ),
             "showVotes": False,
             "showTags": False,
         }
@@ -252,24 +266,33 @@ class UrbanDictionary(callbacks.Plugin):
                 data = self._fetch_define_page_fallback(optterm, timeout)
 
         if not json_data and not data:
-            irc.error(f"Could not retrieve data for '{optterm}'.", prefixNick=False)
+            irc.error(
+                f"Could not retrieve data for '{optterm}'.", prefixNick=False
+            )
             return
 
         if data is None:
             if json_data is None:
-                irc.error(f"Could not retrieve data for '{optterm}'.", prefixNick=False)
+                irc.error(
+                    f"Could not retrieve data for '{optterm}'.",
+                    prefixNick=False,
+                )
                 return
             try:
                 data = json.loads(json_data)
             except json.JSONDecodeError as e:
                 log.error(f"Error parsing JSON: {e}")
-                irc.error("Failed to parse Urban Dictionary data.", prefixNick=False)
+                irc.error(
+                    "Failed to parse Urban Dictionary data.", prefixNick=False
+                )
                 return
 
         definitions = data.get("list", [])
 
         if not definitions:
-            irc.error(f"No definition found for '{optterm}'.", prefixNick=False)
+            irc.error(
+                f"No definition found for '{optterm}'.", prefixNick=False
+            )
             return
 
         # Apply slicing limit
@@ -331,7 +354,12 @@ class UrbanDictionary(callbacks.Plugin):
         urbandictionary,
         [
             getopts(
-                {"disableexamples": "", "showvotes": "", "num": ("int"), "showtags": ""}
+                {
+                    "disableexamples": "",
+                    "showvotes": "",
+                    "num": ("int"),
+                    "showtags": "",
+                }
             ),
             ("text"),
         ],

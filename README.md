@@ -57,9 +57,17 @@ Next, load the plugin:
 
     HTTP timeout in seconds for API requests. Default is _10_.
 
+* **_config supybot.plugins.UrbanDictionary.maxResponseBytes_**
+
+    Maximum UrbanDictionary response size to read. Default is _262144_.
+
 * **_config supybot.plugins.UrbanDictionary.preferDefinePage_**
 
     Prefer scraping the define page first instead of using the API endpoint.
+
+* **_config supybot.plugins.UrbanDictionary.cooldownSeconds_**
+
+    Per-user lookup cooldown for each channel. Private-message use is public and tracked separately.
 
 * **_aka add ud urbandictionary $*_**
 
@@ -69,6 +77,7 @@ Notes:
 
 * API requests are sent over HTTPS.
 * Search terms are URL-encoded automatically.
+* Channel use is controlled by `supybot.plugins.UrbanDictionary.enabled`; private-message use remains public.
 
 ## Example Usage
 

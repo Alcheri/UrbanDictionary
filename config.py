@@ -8,18 +8,22 @@
 
 import supybot.conf as conf
 import supybot.registry as registry
-from supybot.i18n import PluginInternationalization
 
-_ = PluginInternationalization("UrbanDictionary")
+try:
+    from supybot.i18n import PluginInternationalization
+
+    _ = PluginInternationalization("UrbanDictionary")
+except ImportError:
+
+    def _(text):
+        return text
 
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
-    # a bool that specifies whether the user identified himself as an advanced
+    # a bool that specifies whether the user identified themself as an advanced
     # user or not.  You should effect your configuration by manipulating the
     # registry as appropriate.
-    from supybot.questions import expect, anything, something, yn
-
     conf.registerPlugin("UrbanDictionary", True)
 
 
@@ -28,7 +32,7 @@ UrbanDictionary = conf.registerPlugin("UrbanDictionary")
 conf.registerChannelValue(
     UrbanDictionary,
     "maxNumberOfDefinitions",
-    registry.Integer(
+    registry.PositiveInteger(
         10, """Number of definition and examples in output. Max 10."""
     ),
 )
@@ -50,8 +54,17 @@ conf.registerChannelValue(
 conf.registerGlobalValue(
     UrbanDictionary,
     "requestTimeout",
-    registry.Integer(
+    registry.PositiveInteger(
         10, _("""HTTP timeout in seconds for UrbanDictionary API requests.""")
+    ),
+)
+
+conf.registerGlobalValue(
+    UrbanDictionary,
+    "maxResponseBytes",
+    registry.PositiveInteger(
+        262144,
+        _("""Maximum UrbanDictionary response size to read, in bytes."""),
     ),
 )
 
@@ -62,6 +75,18 @@ conf.registerGlobalValue(
         False,
         _(
             """Prefer scraping the define page first instead of using the API endpoint."""
+        ),
+    ),
+)
+
+conf.registerChannelValue(
+    UrbanDictionary,
+    "cooldownSeconds",
+    registry.NonNegativeInteger(
+        5,
+        _(
+            """Sets the per-user UrbanDictionary lookup cooldown for this channel,
+            in seconds. Private-message use is tracked separately."""
         ),
     ),
 )

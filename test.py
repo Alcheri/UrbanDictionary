@@ -6,9 +6,17 @@
 #
 ###
 
-from supybot.test import *
 import supybot.conf as conf
-from unittest.mock import AsyncMock, patch
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
+
+from supybot.test import ChannelPluginTestCase as SupybotChannelPluginTestCase
+from supybot.test import PluginTestCase as SupybotPluginTestCase
+
+from UrbanDictionary import plugin
+
+SupybotChannelPluginTestCase.__test__ = False
+SupybotPluginTestCase.__test__ = False
 
 MOCK_JSON_WITH_DEFINITION = (
     '{"list": [{"definition": "A greeting", "example": "hello there", '
@@ -18,12 +26,15 @@ MOCK_JSON_WITH_DEFINITION = (
 MOCK_JSON_EMPTY_LIST = '{"list": []}'
 
 
-class UrbanDictionaryTestCase(PluginTestCase):
+class UrbanDictionaryTestCase(SupybotPluginTestCase):
+    __test__ = False
     plugins = ("UrbanDictionary",)
 
     def setUp(self):
         super().setUp()
         conf.supybot.plugins.UrbanDictionary.preferDefinePage.setValue(False)
+        conf.supybot.plugins.UrbanDictionary.disableANSI.setValue(False)
+        conf.supybot.plugins.UrbanDictionary.cooldownSeconds.setValue(0)
 
     @patch(
         "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
@@ -123,6 +134,88 @@ class UrbanDictionaryTestCase(PluginTestCase):
         mock_define_fallback.assert_called_once()
         mock_fetch_url.assert_not_called()
         mock_json_fallback.assert_not_called()
+
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
+    def testUrbanDictionaryRejectsLongTermBeforeFetch(self, mock_fetch_url):
+        self.assertError(f"urbandictionary {'a' * 121}")
+        mock_fetch_url.assert_not_called()
+
+
+class UrbanDictionaryChannelTestCase(SupybotChannelPluginTestCase):
+    __test__ = False
+    plugins = ("UrbanDictionary",)
+
+    def setUp(self):
+        super().setUp()
+        conf.supybot.plugins.UrbanDictionary.preferDefinePage.setValue(False)
+        conf.supybot.plugins.UrbanDictionary.disableANSI.setValue(False)
+        conf.supybot.plugins.UrbanDictionary.cooldownSeconds.setValue(0)
+
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
+    def testUrbanDictionaryChannelDisabledByDefault(self, mock_fetch_url):
+        mock_fetch_url.return_value = MOCK_JSON_WITH_DEFINITION
+        conf.supybot.plugins.UrbanDictionary.enabled.setValue(False)
+
+        self.assertNoResponse("urbandictionary hello")
+        mock_fetch_url.assert_not_called()
+
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
+    def testUrbanDictionaryPrivateMessageRemainsPublic(self, mock_fetch_url):
+        mock_fetch_url.return_value = MOCK_JSON_WITH_DEFINITION
+        conf.supybot.plugins.UrbanDictionary.enabled.setValue(False)
+
+        self.assertRegexp(
+            "urbandictionary hello", ":: A greeting", private=True
+        )
+
+    @patch(
+        "UrbanDictionary.plugin.UrbanDictionary._fetch_url",
+        new_callable=AsyncMock,
+    )
+    def testUrbanDictionaryCooldown(self, mock_fetch_url):
+        mock_fetch_url.return_value = MOCK_JSON_WITH_DEFINITION
+        conf.supybot.plugins.UrbanDictionary.enabled.setValue(True)
+        conf.supybot.plugins.UrbanDictionary.cooldownSeconds.setValue(5)
+
+        self.assertRegexp("urbandictionary hello", ":: A greeting")
+        self.assertError("urbandictionary hello")
+        self.assertEqual(mock_fetch_url.call_count, 1)
+
+
+class UrbanDictionarySecurityTestCase(unittest.TestCase):
+    def setUp(self):
+        self.plugin = plugin.UrbanDictionary.__new__(plugin.UrbanDictionary)
+        self.plugin.registryValue = MagicMock(return_value=262144)
+
+    def test_clean_text_strips_unsafe_controls_and_preserves_irc_formatting(
+        self,
+    ):
+        result = self.plugin._clean_text("\x0304red\x03\x00 text")
+
+        self.assertIn("\x03", result)
+        self.assertNotIn("\x00", result)
+
+    @patch("UrbanDictionary.plugin.urllib.request.urlopen")
+    def test_fetch_url_fallback_rejects_large_response(self, mock_urlopen):
+        response = MagicMock()
+        response.headers = {"Content-Length": str(262145)}
+        mock_urlopen.return_value.__enter__.return_value = response
+
+        result = self.plugin._fetch_url_fallback(
+            "https://api.urbandictionary.com/v0/define?term=test",
+            1,
+        )
+
+        self.assertIsNone(result)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

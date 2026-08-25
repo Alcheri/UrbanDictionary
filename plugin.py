@@ -36,7 +36,9 @@ DEFAULT_USER_AGENT = "Limnoria-UrbanDictionary/1.0 (+https://github.com/Alcheri/
 ALLOWED_HOSTS = {"api.urbandictionary.com", "www.urbandictionary.com"}
 DEFAULT_MAX_RESPONSE_BYTES = 256 * 1024
 MAX_TERM_LENGTH = 120
-MAX_REPLY_LENGTH = 1000
+MAX_REPLY_LENGTH = 8000  # Safety net only; Limnoria's "more" mechanism
+# (supybot.reply.mores) handles pagination of anything longer than one
+# IRC line, so this just guards against pathologically large payloads.
 MAX_ENTRY_LENGTH = 300
 MAX_DEFINITIONS = 10
 MAX_TAG_LENGTH = 40
@@ -491,11 +493,11 @@ class UrbanDictionary(callbacks.Plugin):
         limit = self._clamp_count(args.get("numberOfDefinitions", 10))
         definitions = definitions[:limit]
 
-        MAX_TOTAL_LENGTH = 1000  # Limit total response length in characters
+        # Include every requested definition in full. Large combined output
+        # is intentionally left to Limnoria's own "more" mechanism
+        # (supybot.reply.mores) to paginate across multiple IRC messages,
+        # rather than being pre-emptively cut short here.
         output = []
-        total_length = 0
-        include_first = True
-
         for entry in definitions:
             definition = self._clean_text(
                 entry.get("definition", ""), max_length=MAX_ENTRY_LENGTH
@@ -512,14 +514,7 @@ class UrbanDictionary(callbacks.Plugin):
             if args["showVotes"]:
                 formatted += f" (+{thumbs_up}/-{thumbs_down})"
 
-            # Ensure at least one definition is included
-            if include_first:
-                include_first = False
-            elif total_length + len(formatted) > MAX_TOTAL_LENGTH:
-                break
-
             output.append(formatted)
-            total_length += len(formatted)
 
         response = " | ".join(output)
 
@@ -531,7 +526,8 @@ class UrbanDictionary(callbacks.Plugin):
                     for tag in tags
                 ]
                 tag_text = " | ".join(tag for tag in safe_tags if tag)
-                response = f"{response} | Tags: {tag_text}"
+                if tag_text:
+                    response = f"{response} | Tags: {tag_text}"
 
         # Check if ANSI should be disabled
         if self.registryValue("disableANSI"):

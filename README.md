@@ -43,7 +43,8 @@ Next, load the plugin:
 
 * **_config supybot.plugins.UrbanDictionary.maxNumberOfDefinitions_**
 
-    Number of definition and examples in output. Max 10.
+    Number of definitions and examples in output by default. Max 10 (use
+    `--num` to request more, up to the channel max). Default is _3_.
 
 * **_config supybot.plugins.UrbanDictionary.disableANSI_**
 

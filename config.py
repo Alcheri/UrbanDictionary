@@ -33,7 +33,9 @@ conf.registerChannelValue(
     UrbanDictionary,
     "maxNumberOfDefinitions",
     registry.PositiveInteger(
-        10, """Number of definition and examples in output. Max 10."""
+        3,
+        """Number of definitions and examples in output by default. """
+        """Max 10 (use --num to request more, up to the channel max).""",
     ),
 )
 
